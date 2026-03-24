@@ -1,0 +1,3 @@
+Products: 58
+Variants: 58
+Pages: 5

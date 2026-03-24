@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://thekindpen.pixiespantryshop.com/sitemap.xml

@@ -126,32 +126,43 @@ def generate_site():
             if not handle:
                 continue
                 
-            brand = row.get("Brand", "The Kind Pen").strip()
+            brand = "The Kind Pen"
             title = row.get("Title", "").strip()
-            body_html = row.get("Body (HTML)", "").strip()
-            option1_name = row.get("Option1 Name", "").strip()
-            option1_value = row.get("Option1 Value", "").strip()
-            price_str = row.get("Wholesale Price", "0").replace("$", "").replace(",", "").strip()
+            body_html = row.get("Description", "").strip()
+            category = row.get("Category", "General").strip()
+            
+            price_str = row.get("MSRP", "0").replace("$", "").replace(",", "").strip()
             try:
                 price = float(price_str)
             except ValueError:
                 price = 0.0
                 
-            variant_image = row.get("Variant Image", "").strip()
+            images = row.get("Image URL", "").split(" | ")
+            variant_image = images[0] if images else ""
             
+            # Stock Status check
+            stock_status = row.get("Stock Status", "In Stock").strip()
+            if stock_status == "Out of Stock":
+                continue  # Skip OOS variants
+                
             if handle not in products_dict:
                 products_dict[handle] = {
                     "handle": handle,
                     "brand": brand,
                     "title": title,
                     "body_html": body_html,
-                    "options": [{"name": option1_name}] if option1_name else [],
+                    "options": [{"name": "Default"}],
                     "in_stock_variants": [],
-                    "product_type": option1_name or "Accessories", # Use Option1 Name as product_type per prompt
+                    "product_type": category,
+                    "featured_image": variant_image,
+                    "all_images": images
                 }
                 
             products_dict[handle]["in_stock_variants"].append({
-                "option1_value": option1_value,
+                "variant_id": row.get("SKU", "default").strip(),
+                "sku": row.get("SKU", "").strip(),
+                "option1_name": "Default",
+                "option1_value": "Default",
                 "price": price,
                 "variant_image": variant_image
             })
